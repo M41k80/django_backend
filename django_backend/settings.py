@@ -4,7 +4,10 @@ from datetime import timedelta
 from decouple import config, Config
 import dj_database_url
 import os
+import environ
 
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,8 +18,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=False, cast=bool)
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = ['.onrender.com']
 
 
@@ -91,8 +94,8 @@ WSGI_APPLICATION = 'django_backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL')
+    'default': dj_database_url.env(
+        default=env('DATABASE_URL')
     )
 }
 
