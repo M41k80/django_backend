@@ -7,7 +7,13 @@ import os
 import environ
 
 env = environ.Env()
-environ.Env.read_env()
+
+env_file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')  
+
+print(f"Path to .env: {env_file_path}")  
+environ.Env.read_env(env_file_path)  
+
+SECRET_KEY = env('SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,15 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = env('SECRET_KEY')
+
 DEBUG = env('DEBUG', default=False, cast=bool)
+
 ALLOWED_HOSTS = ['.onrender.com']
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
-
-ALLOWED_HOSTS = ['.onrender.com']
 
 
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -94,11 +98,8 @@ WSGI_APPLICATION = 'django_backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.env(
-        default=env('DATABASE_URL')
-    )
+    'default': env.db('DATABASE_URL')  # Utiliza env.db() para leer la URL de la base de datos
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
