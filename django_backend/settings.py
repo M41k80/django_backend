@@ -5,6 +5,7 @@ from decouple import config, Config
 import dj_database_url
 import os
 import environ
+import django
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -53,8 +55,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+STATICFILES_DIRS = [
+    os.path.join(django.__path__[0], 'contrib/admin/static'),  # Admin
+    os.path.join(os.path.dirname(django.__path__[0]), 'drf-yasg/static'),  # Swagger
+    os.path.join(os.path.dirname(django.__path__[0]), 'rest_framework/static'),  # DRF (para ReDoc)
+]
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Elimina STATICFILES_DIRS si no tienes una carpeta `static` adicional
 # STATICFILES_DIRS = [
@@ -63,7 +73,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 if not DEBUG:
     # Solo cuando estés en producción
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+    ALLOWED_HOSTS = ['tu-app.onrender.com', '.onrender.com']  # Añade tu URL específica
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 #STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
