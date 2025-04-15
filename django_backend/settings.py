@@ -1,33 +1,33 @@
 from pathlib import Path
 import re
 from datetime import timedelta
-from decouple import config, Config
+from decouple import config
 import dj_database_url
 import os
-import environ
-import django
 
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-
-SECRET_KEY = env('SECRET_KEY')
-DEBUG = env('DEBUG', default=False)
-
-
-
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = ['.onrender.com']
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,46 +41,37 @@ INSTALLED_APPS = [
     'users',
     'predictions',
     'drf_yasg',
+    'corsheaders',
     
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
-STATICFILES_DIRS = [
-    os.path.join(django.__path__[0], 'contrib/admin/static'),  # Admin
-    os.path.join(os.path.dirname(django.__path__[0]), 'drf-yasg/static'),  # Swagger
-    os.path.join(os.path.dirname(django.__path__[0]), 'rest_framework/static'),  # DRF (para ReDoc)
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'accept',
+    'x-csrftoken',  # Si usas tokens CSRF
+    'access-control-allow-origin',  # Para asegurar que todas las cabeceras sean aceptadas
 ]
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+CORS_ALLOW_CREDENTIALS = True
 
-# Elimina STATICFILES_DIRS si no tienes una carpeta `static` adicional
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'static'),
-# ]
-
-if not DEBUG:
-    # Solo cuando estés en producción
-    ALLOWED_HOSTS = ['tu-app.onrender.com', '.onrender.com']  # Añade tu URL específica
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-
-
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+CORS_ALLOW_METHODS = [
+    'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS',  # Asegúrate de que OPTIONS esté permitido
+]
 
 ROOT_URLCONF = 'django_backend.urls'
 
@@ -118,8 +109,13 @@ WSGI_APPLICATION = 'django_backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db('DATABASE_URL')  # Utiliza env.db() para leer la URL de la base de datos
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL')
+    )
 }
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -155,7 +151,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+
+# Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
