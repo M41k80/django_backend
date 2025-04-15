@@ -4,6 +4,7 @@ from datetime import timedelta
 from decouple import config
 import dj_database_url
 import os
+from corsheaders.defaults import default_headers
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -48,31 +49,32 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOW_HEADERS = [
-    'content-type',
-    'authorization',
-    'accept',
-    'x-csrftoken',  # Si usas tokens CSRF
-    'access-control-allow-origin',  # Para asegurar que todas las cabeceras sean aceptadas
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'access-control-allow-origin',
 ]
 
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
-    'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS',  # Asegúrate de que OPTIONS esté permitido
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
 
 ROOT_URLCONF = 'django_backend.urls'
