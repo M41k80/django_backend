@@ -18,7 +18,7 @@ class PredictAndSaveView(APIView):
         data = request.data.copy()
 
         # enviar datos al microservicio FastAPI
-        fastapi_response = requests.post("http://localhost:8001/predict_sales", json=data)
+        fastapi_response = requests.post("https://fast-api-backend-145r.onrender.com/predict_sales", json=data)
 
         if fastapi_response.status_code != 200:
             return Response({"error": "La predicción falló"}, status=500)
