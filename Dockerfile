@@ -1,23 +1,26 @@
 # Usa una imagen oficial de Python
 FROM python:3.11-slim
 
-# Establece el directorio de trabajo en el contenedor
+# Instala dependencias del sistema necesarias
+RUN apt-get update && apt-get install -y \
+    libpq-dev gcc build-essential curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Establece directorio de trabajo
 WORKDIR /app
 
-# Copia e instala las dependencias
+# Copia requirements e instala
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-
-
-# Copia el resto del código
+# Copia el resto del proyecto
 COPY . .
 
-# Recoge archivos estáticos antes de correr el server
+# Ejecuta collectstatic (puedes mover esto a Render si da problemas)
 RUN python manage.py collectstatic --noinput
 
-# Expone el puerto (Django usa 8000 por defecto)
+# Expone el puerto
 EXPOSE 8000
 
-# Comando para arrancar el servidor Django
+# Comando para producción con gunicorn
 CMD ["gunicorn", "django_backend.wsgi:application", "--bind", "0.0.0.0:8000"]
